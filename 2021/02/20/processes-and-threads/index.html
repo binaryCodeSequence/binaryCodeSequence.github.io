@@ -17,19 +17,21 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>404 Not Found：该页无法显示 | COSProject 技术笔记</title>
-  <meta property="og:type" content="website">
-<meta property="og:title" content="404 Not Found：该页无法显示">
-<meta property="og:url" content="https://bytestruct.com/404.html">
+  <title>进程和线程 | COSProject 技术笔记</title>
+  <meta name="description" content="很多同学都听说过，现代操作系统比如 Mac OS X，UNIX，Linux，Windows 等，都是支持 “多任务” 的操作系统。 什么叫 “多任务” 呢？简单地说，就是操作系统可以同时运行多个任务。打个比方，你一边在用浏览器上网，一边在听 MP3，一边在用 Word 赶作业，这就是多任务。还有很多任务悄悄地在后台同时运行着，只是桌面上没有显示而已。 现在，多核CPU已经非常普及了，但是，即使过去">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程和线程">
+<meta property="og:url" content="https://bytestruct.com/2021/02/20/processes-and-threads/index.html">
 <meta property="og:site_name" content="COSProject 技术笔记">
+<meta property="og:description" content="很多同学都听说过，现代操作系统比如 Mac OS X，UNIX，Linux，Windows 等，都是支持 “多任务” 的操作系统。 什么叫 “多任务” 呢？简单地说，就是操作系统可以同时运行多个任务。打个比方，你一边在用浏览器上网，一边在听 MP3，一边在用 Word 赶作业，这就是多任务。还有很多任务悄悄地在后台同时运行着，只是桌面上没有显示而已。 现在，多核CPU已经非常普及了，但是，即使过去">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-02-20T08:25:30.313Z">
-<meta property="article:modified_time" content="2021-02-20T08:25:30.313Z">
+<meta property="article:published_time" content="2021-02-20T08:59:58.000Z">
+<meta property="article:modified_time" content="2021-02-28T09:40:01.649Z">
 <meta property="article:author" content="binaryCodeSequence">
-<meta property="article:tag" content="java,JDK,spring,springboot,源码分析">
+<meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
   <!-- Canonical links -->
-  <link rel="canonical" href="https://bytestruct.com/404.html">
+  <link rel="canonical" href="https://bytestruct.com/2021/02/20/processes-and-threads/index.html">
   
     <link rel="alternate" href="/atom.xml" title="COSProject 技术笔记" type="application/atom+xml">
   
@@ -192,16 +194,25 @@
 
   
   
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">线程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
 <main class="main" role="main">
   <div class="content">
-  <article id="page-" class="article article-type-page" itemscope itemtype="http://schema.org/BlogPosting">
+  <article id="post-processes-and-threads" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
     <div class="article-header">
       
         
   
     <h1 class="article-title" itemprop="name">
-      404 Not Found：该页无法显示
+      进程和线程
     </h1>
   
 
@@ -209,22 +220,42 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/404.html" class="article-date">
-	  <time datetime="2021-02-20T08:25:30.313Z" itemprop="datePublished">2021-02-20</time>
+	<a href="/2021/02/20/processes-and-threads/" class="article-date">
+	  <time datetime="2021-02-20T08:59:58.000Z" itemprop="datePublished">2021-02-20</time>
 	</a>
 </span>
         
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+  </span>
+
         
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Java/" rel="tag">Java</a>
+  </span>
+
 
         
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/404.html#comments" class="article-comment-link">评论</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2021/02/20/processes-and-threads/#comments" class="article-comment-link">评论</a></span>
         
       </div>
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <script type="text/javascript" src="//www.qq.com/404/search_children.js" charset="utf-8" homePageUrl="<%- config.url %>" homePageName="回到我的主页"></script>
+        <p>很多同学都听说过，现代操作系统比如 Mac OS X，UNIX，Linux，Windows 等，都是支持 “多任务” 的操作系统。</p>
+<p>什么叫 “多任务” 呢？简单地说，就是操作系统可以同时运行多个任务。打个比方，你一边在用浏览器上网，一边在听 MP3，一边在用 Word 赶作业，这就是多任务。还有很多任务悄悄地在后台同时运行着，只是桌面上没有显示而已。</p>
+<p>现在，多核CPU已经非常普及了，但是，即使过去的单核CPU，也可以执行多任务。由于CPU执行代码都是顺序执行的，那么，单核CPU是怎么执行多任务的呢？</p>
+<p>答案就是操作系统轮流让各个任务交替执行，任务1执行0.01秒，切换到任务2，任务2执行0.01秒，再切换到任务3，执行0.01秒……这样反复执行下去。表面上看，每个任务都是交替执行的，但是，由于CPU的执行速度实在是太快了，我们感觉就像所有任务都在同时执行一样。</p>
+<p>真正的并行执行多任务只能在多核CPU上实现，但是，由于任务数量远远多于CPU的核心数量，所以，操作系统也会自动把很多任务轮流调度到每个核心上执行。</p>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>对于操作系统来说，一个任务就是一个进程（Process），比如打开一个浏览器就是启动一个浏览器进程，打开一个记事本就启动了一个记事本进程，打开两个记事本就启动了两个记事本进程，打开一个Word就启动了一个Word进程。</p>
+<p>也就是说，一个程序就是一个进程。</p>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>比如 Word，它可以同时进行打字、拼写检查、打印等事情。在一个进程内部，要同时干多件事，就需要同时运行多个“子任务”，我们把进程内的这些“子任务”称为线程（Thread）。</p>
+<p>由于每个进程至少要干一件事，所以，<strong>一个进程至少有一个线程</strong>。当然，像 Word 这种复杂的进程可以有多个线程，多个线程可以同时执行，多线程的执行方式和多进程是一样的，也是由操作系统在多个线程之间快速切换，让每个线程都短暂地交替运行，看起来就像同时执行一样。当然，真正地同时执行多线程需要多核 CPU 才可能实现。</p>
+<p>也就是说，可以把进程理解成一个容器，里面可能有很多个线程帮我们做不同的事情。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.liaoxuefeng.com/wiki/1016959663602400/1017627212385376">进程和线程</a></p>
 
       
     </div>
@@ -234,7 +265,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="https://bytestruct.com/404.html" title="404 Not Found：该页无法显示" target="_blank" rel="external">https://bytestruct.com/404.html</a>
+      <a href="https://bytestruct.com/2021/02/20/processes-and-threads/" title="进程和线程" target="_blank" rel="external">https://bytestruct.com/2021/02/20/processes-and-threads/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -265,12 +296,35 @@
   </article>
   
     
+  <section id="comments">
+  	
+  </section>
+
 
   
 </div>
 
   <nav class="bar bar-footer clearfix" data-stick-bottom>
   <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2021/02/20/java-thread-base/" title="Java 线程基础"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <!-- 
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+     -->
+  </ul>
   
   
   
@@ -339,6 +393,12 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
 
 
 
+   
+
+
+
+
+   
 
 
 

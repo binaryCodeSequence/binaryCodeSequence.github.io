@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://bytestruct.com/2021/03/16/java-memory-model/</loc>
+    
+    <lastmod>2021-03-21</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/2021/02/28/happens-before/</loc>
+    
+    <lastmod>2021-03-16</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/2021/02/24/synchronization-and-locks/</loc>
+    
+    <lastmod>2021-02-28</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/2021/02/20/processes-and-threads/</loc>
+    
+    <lastmod>2021-02-28</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/2021/02/20/java-thread-base/</loc>
+    
+    <lastmod>2021-02-28</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/2021/02/20/concurrency-and-parallel/</loc>
+    
+    <lastmod>2021-02-28</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/tags/index.html</loc>
+    
+    <lastmod>2021-02-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/404.html</loc>
+    
+    <lastmod>2021-02-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/about/index.html</loc>
+    
+    <lastmod>2021-02-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/categories/index.html</loc>
+    
+    <lastmod>2021-02-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/repository/index.html</loc>
+    
+    <lastmod>2021-02-20</lastmod>
+    
+  </url>
+  
+
+  <url>
+    <loc>https://bytestruct.com/</loc>
+    <lastmod>2021-04-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  
+  <url>
+    <loc>https://bytestruct.com/tags/Java/</loc>
+    <lastmod>2021-04-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+
+  
+  <url>
+    <loc>https://bytestruct.com/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</loc>
+    <lastmod>2021-04-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/categories/Java-%E5%B9%B6%E5%8F%91/</loc>
+    <lastmod>2021-04-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://bytestruct.com/categories/Java-VM/</loc>
+    <lastmod>2021-04-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+</urlset>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>【番外篇】并发&amp;并行 | COSProject 技术笔记</title>
+  <meta name="description" content="在学习多线程的时候，总是会提到同步、异步、并发、并行等术语，这些术语对于初学者来说晦涩难懂，而且网上的其它文章对此解释的含糊不清；还有就是好多复制粘贴的文章，甚至这些文章连错别字都一样。 同步同步的英文是：Synchronization，根据维基百科中对 Synchronization 的解释：同步是指两种不同但相关概念的其中一个：进程同步和数据同步。 在生产者－消费者关系中，消费者会一直等待生产">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【番外篇】并发&amp;并行">
+<meta property="og:url" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/index.html">
+<meta property="og:site_name" content="COSProject 技术笔记">
+<meta property="og:description" content="在学习多线程的时候，总是会提到同步、异步、并发、并行等术语，这些术语对于初学者来说晦涩难懂，而且网上的其它文章对此解释的含糊不清；还有就是好多复制粘贴的文章，甚至这些文章连错别字都一样。 同步同步的英文是：Synchronization，根据维基百科中对 Synchronization 的解释：同步是指两种不同但相关概念的其中一个：进程同步和数据同步。 在生产者－消费者关系中，消费者会一直等待生产">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/1611711751.png">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/Multiple_Processes_Accessing_the_shared_resource.png">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/1612106033.png">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/concurrency-vs-parallelism-1.png">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/introduction-2.png">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/concurrency-vs-parallelism-2.png">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/concurrency-vs-parallelism-3.png">
+<meta property="og:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/concurrency-vs-parallelism-4.png">
+<meta property="article:published_time" content="2021-02-20T15:47:19.000Z">
+<meta property="article:modified_time" content="2021-02-28T09:39:51.550Z">
+<meta property="article:author" content="binaryCodeSequence">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bytestruct.com/2021/02/20/concurrency-and-parallel/1611711751.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://bytestruct.com/2021/02/20/concurrency-and-parallel/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="COSProject 技术笔记" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body class="main-center theme-black no-sidebar" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/binaryCodeSequence" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">ByteStruct</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Java Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> QingDao, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/binaryCodeSequence" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5"><span class="toc-number">1.</span> <span class="toc-text">同步</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%88%96%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="toc-number">1.1.</span> <span class="toc-text">线程或进程同步</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E6%AD%A5"><span class="toc-number">2.</span> <span class="toc-text">异步</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91"><span class="toc-number">3.</span> <span class="toc-text">并发</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E8%A1%8C%E6%89%A7%E8%A1%8C"><span class="toc-number">4.</span> <span class="toc-text">并行执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E8%A1%8C%E5%B9%B6%E5%8F%91%E6%89%A7%E8%A1%8C"><span class="toc-number">5.</span> <span class="toc-text">并行并发执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E8%A1%8C%E6%80%A7"><span class="toc-number">6.</span> <span class="toc-text">并行性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">7.</span> <span class="toc-text">参考资料</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-concurrency-and-parallel" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      【番外篇】并发&amp;并行
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2021/02/20/concurrency-and-parallel/" class="article-date">
+	  <time datetime="2021-02-20T15:47:19.000Z" itemprop="datePublished">2021-02-20</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Java-%E5%B9%B6%E5%8F%91/">Java 并发</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Java/" rel="tag">Java</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2021/02/20/concurrency-and-parallel/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>在学习多线程的时候，总是会提到同步、异步、并发、并行等术语，这些术语对于初学者来说晦涩难懂，而且网上的其它文章对此解释的含糊不清；还有就是好多复制粘贴的文章，甚至这些文章连错别字都一样。</p>
+<h2 id="同步"><a href="#同步" class="headerlink" title="同步"></a>同步</h2><p>同步的英文是：Synchronization，根据<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Synchronization_(computer_science)">维基百科中对 Synchronization 的解释</a>：同步是指两种不同但相关概念的其中一个：进程同步和数据同步。</p>
+<p>在生产者－消费者关系中，消费者会一直等待生产者的数据。</p>
+<p>分叉和联接：当主任务想快速处理某些数据时，可以分成 N 个子任务；而主任务又会等待所有子任务处理完成，然后主任务再进行其它业务逻辑处理。</p>
+<p><img src="./1611711751.png"></p>
+<p>独家资源使用或者说是排他资源使用：当有多个线程需要访问同一个资源时，其他线程只能等待。</p>
+<p>上面说的这三种是同步的主要需求，下面详细说一下线程或进程同步。</p>
+<h3 id="线程或进程同步"><a href="#线程或进程同步" class="headerlink" title="线程或进程同步"></a>线程或进程同步</h3><p>对于同步来说，我个人认为线程同步和进程同步是一样的。出现这两种说法应该是历史原因，因为操作系统之前的最小调度单位是进程，而随着发展现在变成了线程。所以我觉得只需要知道线程同步就可以了。</p>
+<p>假设有三个线程，即1、2 和 3。这三个线程正在同时执行，并且它们需要访问同一个公共资源，如下图：</p>
+<p><img src="./Multiple_Processes_Accessing_the_shared_resource.png"></p>
+<p>为了防止访问共享资源时产生冲突。因此，当线程 1 和 2 都尝试访问该资源时，必须同一时间只有一个线程能访问。</p>
+<p>如果将其分配给线程 1，则线程 2 需要等待，直到线程 1 释放该资源。</p>
+<blockquote>
+<p>其实可以简单的认为：在多线程环境下，同一时间只有一个线程能访问资源(其它线程会等待)，就可以认为是同步。</p>
+<p>在  Java 中要想实现这种情况，可以使用 <code>synchronized</code> 关键字。</p>
+</blockquote>
+<h2 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h2><p>在维基百科中也有对 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Asynchrony_(computer_programming)">Asynchrony (computer programming)</a>  的解释，通俗的讲就是：当发生了一个事件的时候，这个事件的处理方式和程序的流程是没有关系的，也就是说程序不会一直等待这个事件处理完。</p>
+<p>例如，当管理员 A 查询所有用户的时候，管理员 B 同时又能对某个用户信息做修改，而不是要等到管理员 A 操作结束后才能修改用户信息。</p>
+<p><img src="./1612106033.png"></p>
+<p>还有就是在<strong>同步</strong>中提到的子任务、线程，这些都是异步。</p>
+<blockquote>
+<p>其实可以简单的认为：只要某一个事件在另一个线程中执行，这就是异步。</p>
+</blockquote>
+<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><p>假设计算机只有一个 CPU，则应用程序可能无法完全同时完成多个任务，但是在应用程序中一次可能要完成多项任务。为了同时完成多个任务，CPU 在执行期间会<strong>在不同任务之间进行切换</strong>。</p>
+<p>类似下面这张图一会执行 <code>Task1</code> 一会执行 <code>Task2</code>，但是并不会一起执行。</p>
+<p><img src="./concurrency-vs-parallelism-1.png"></p>
+<p>可能你看到这张图的时候会惊呼：这不就是多线程的执行方式吗？</p>
+<p>是的，这就是多线程的执行方式；注意，这里说的是执行方式。多线程并不等于 CPU，多线程指的是同一个程序中有多个执行的线程，这些线程由不同的 CPU 内核处理。</p>
+</br>
+
+<p><strong>另外值得注意的是：</strong>这里不考虑 CPU 超线程技术，所以上图中的两个任务永远不会同一时间开始执行，<code>Task1</code> 或 <code>Task2</code> 必定有一个先执行。</p>
+<p>通过上面说的这些，我们可以得出三个重点：</p>
+<ol>
+<li>单核 CPU</li>
+<li>两个(多个)任务永远不会同一时间开始执行</li>
+<li>同时完成多个任务</li>
+</ol>
+</br>
+所以个人理解，并发就是 CPU 执行多任务的一种方式，这些任务交替执行并且大概在相同的时间内完成，但是 CPU 并不是同时执行这些任务。
+
+<p>也可以简化为：多个任务交替执行，但是这些任务并不是同时开始执行并且大概在相同时间内完成。<br></br></p>
+</br>
+下图展示了多线程和 CPU 之间的关系：
+
+<p><img src="./introduction-2.png"></p>
+<blockquote>
+<p>这里的 CPU 你可以认为是多核 CPU 中某个核心的一个线程或者就是一个单核的 CPU。这里说 “某个核心的一个线程”，是因为 <strong>超线程</strong> 技术；如果这里只是说某个 CPU 核心，则该核心使用了超线程技术，就有可能会导致两个任务同时开始。<br>可以简单的理解超线程技术：使某个物理内核实现并行计算。超线程技术我也不是很理解，就知道能并行计算。</p>
+</blockquote>
+<h2 id="并行执行"><a href="#并行执行" class="headerlink" title="并行执行"></a>并行执行</h2><p>先说一下，并发和并行是不一样的。</p>
+<p>并行执行是指，计算机有多个 CPU 或一个 CPU 有多个核心，<strong>同时执行多个任务</strong>。但是，并行执行不等于并行性。</p>
+<p>并行执行如下图所示：</p>
+<p><img src="./concurrency-vs-parallelism-2.png"></p>
+<h2 id="并行并发执行"><a href="#并行并发执行" class="headerlink" title="并行并发执行"></a>并行并发执行</h2><p>根据 CPU 上分布的不同任务，得出的结论就是：在同一 CPU 上执行的任务是并发执行的，而在不同 CPU 上执行的线程是并行执行的。</p>
+<p><img src="./concurrency-vs-parallelism-3.png"></p>
+<h2 id="并行性"><a href="#并行性" class="headerlink" title="并行性"></a>并行性</h2><p>假设现在有一个比较复杂的任务，我们把这个复杂的任务拆分成 4 个子任务，然后将这 4 个子任务分别由 4 个不同的线程执行，并且这些线程分别运行在 2 个不同的 CPU 上。</p>
+<p>这意味着，这些子任务的一部分是并发执行的(在同一 CPU 上执行的)，而另一部分是并行执行的(在不同 CPU 上执行的)。</p>
+<p><img src="./concurrency-vs-parallelism-4.png"></p>
+<p>如果这4个子任务是由在各自的CPU上运行的4个线程执行的(总共4个CPU)，那么任务执行应该是完全并行的。</p>
+<p>然而，将一个任务分解为与可用cpu数量完全相同的子任务并不总是容易的</p>
+<p>通常，更容易的做法是将一个任务分解为一些自然适合手头任务的子任务，然后让线程调度程序负责将线程分配到可用的cpu中。</p>
+<blockquote>
+<p>并行性和<strong>并行并发执行</strong>看起来很相似，但是术语并行性是指应用程序将某个任务分解为较小的子任务，这些子任务可以并行处理。</p>
+<p>我个人认为，并行性是在应用程序中的说法，并发和并行是在 CPU 中的说法。</p>
+</blockquote>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Synchronization_(computer_science)#The_need_for_synchronization">Synchronization (computer science)</a></p>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Asynchrony_(computer_programming)">Asynchrony (computer programming)</a></p>
+<p><a target="_blank" rel="noopener" href="http://tutorials.jenkov.com/java-concurrency/concurrency-vs-parallelism.html">Concurrency vs. Parallelism</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.monades.dev/concurrency-is-different-than-parallelism/">Concurrency != Parallelism</a></p>
+<p><a target="_blank" rel="noopener" href="https://luminousmen.com/post/concurrency-and-parallelism-are-different">Concurrency and parallelism are two different things</a></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://bytestruct.com/2021/02/20/concurrency-and-parallel/" title="【番外篇】并发&amp;并行" target="_blank" rel="external">https://bytestruct.com/2021/02/20/concurrency-and-parallel/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/binaryCodeSequence" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/binaryCodeSequence" target="_blank"><span class="text-dark">ByteStruct</span><small class="ml-1x">Java Developer</small></a></h3>
+        <div>对新的技术有追求，关注后端动态；喜欢 coding，热爱开源。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2021/02/24/synchronization-and-locks/" title="Synchronization and Locks"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2021/02/20/java-thread-base/" title="Java 线程基础"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    <!-- 
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+     -->
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/binaryCodeSequence" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+
+
+
+
+
+
+</body>
+</html>
